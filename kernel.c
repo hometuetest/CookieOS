@@ -102,9 +102,17 @@ void terminal_writestring(const char* data)
 {
 	size_t datalen = strlen(data);
 	for ( size_t i = 0; i < datalen; i++ )
+	{
 		terminal_putchar(data[i]);
+	}
 }
- 
+
+void test_newline()
+{
+	terminal_column = 0;
+	terminal_row++;
+}
+
 #if defined(__cplusplus)
 extern "C" /* Use C linkage for kernel_main. */
 #endif
@@ -114,4 +122,6 @@ void kernel_main()
 	/* Since there is no support for newlines in terminal_putchar yet, \n will
 	   produce some VGA specific character instead. This is normal. */
 	terminal_writestring("Hello, kernel World from hometue! :D\n");
+	test_newline();
+	terminal_writestring("Testing test_newline()");
 }
