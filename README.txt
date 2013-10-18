@@ -3,7 +3,7 @@ Hi. This is my repository for my OS. This shall be an epic place to where advent
 
 How to get around
 -----------------------------------
-Um...not much...i haven't arranged my repository much so its messy hell... but hey, if you want a screenshot, click the .png file. Not guarenteed to be the latest.
+Um...not much...i haven't arranged my repository much so its messy... but hey, if you want a screenshot or look around, go to the source page. Not guarenteed to be the latest.
 
 
 
