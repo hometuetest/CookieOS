@@ -98,12 +98,28 @@ void terminal_putchar(char c)
 	}
 }
 
+static inline
+void outb(unsigned short port, unsigned char val)
+{
+    asm volatile( "outb %0, %1"
+                  : : "a"(val), "Nd"(port) );
+}
+
+static inline
+unsigned char inb(unsigned short port)
+{
+    unsigned char ret;
+    asm volatile( "inb %1, %0"
+                  : "=a"(ret) : "Nd"(port) );
+    return ret;
+}
+
 void newline()
 {
 	terminal_column = 0;
 	terminal_row++;
 }
- 
+
 void terminal_writestring(const char* data)
 {
 	size_t datalen = strlen(data);
@@ -118,14 +134,26 @@ void terminal_writestring(const char* data)
 	}
 }
 
+const unsigned char detect_number_hardrive()
+{
+	const unsigned char number_hardrive=inb(0x0475);
+	return number_hardrive;
+}
+
+void sound_1()
+{
+	outb(0x61,1);
+	outb(0x61,0);
+}
+
 #if defined(__cplusplus)
 extern "C" /* Use C linkage for kernel_main. */
 #endif
 void kernel_main()
 {
 	terminal_initialize();
-	/* Since there is no support for newlines in terminal_putchar yet, \n will
-	   produce some VGA specific character instead. This is normal. */
+	sound_1();
 	terminal_writestring("Hello, kernel World from hometue! :D\n");
-	terminal_writestring("Testing newline()");
+	terminal_writestring("Testing newline()\n");
+	terminal_writestring(detect_number_hardrive());
 }
