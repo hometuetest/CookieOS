@@ -134,10 +134,16 @@ void terminal_writestring(const char* data)
 	}
 }
 
-const unsigned char detect_number_hardrive()
+unsigned char detect_number_harddrive()
 {
-	const unsigned char number_hardrive=inb(0x0475);
-	return number_hardrive;
+	unsigned char number_harddrive=inb(0x0475);
+	return number_harddrive;
+}
+
+unsigned char detect_display_mode()
+{
+	unsigned char display_mode=inb(0x0449);
+	return display_mode;
 }
 
 void sound_1()
@@ -155,5 +161,7 @@ void kernel_main()
 	sound_1();
 	terminal_writestring("Hello, kernel World from hometue! :D\n");
 	terminal_writestring("Testing newline()\n");
-	terminal_writestring(detect_number_hardrive());
+	terminal_putchar(detect_number_harddrive());
+	terminal_writestring("\n");
+	terminal_putchar(detect_display_mode());
 }
