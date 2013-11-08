@@ -11,9 +11,9 @@ Things to do
 -----------------------------------
 1. Arrange the repository
 
-2. Give a better name(any ideas, put it in the issues page if you got the time to do so...don't ask me how, just google how...)
+2. Give the user a cookie
 
-3. Make a bootable medium(some time when I ain't lazy)
+3. Make a bootable iso(some time when I ain't lazy)
 
 4. Code a better OS worth people actually seeing(hey, don't complain, its not easy)
 
