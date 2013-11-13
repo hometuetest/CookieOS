@@ -3,12 +3,14 @@
 #endif
 #include <stddef.h>
 #include <stdint.h>
- 
+
+const uint32_t CPUID_FLAG_MSR = 1 << 5;
+
 /* Check if the compiler thinks if we are targeting the wrong operating system. */
 #if defined(__linux__)
 #error "You are not using a cross-compiler, you will most certainly run into trouble"
 #endif
- 
+
 /* Hardware text mode color constants. */
 enum vga_color
 {
@@ -29,7 +31,14 @@ enum vga_color
 	COLOR_LIGHT_BROWN = 14,
 	COLOR_WHITE = 15,
 };
- 
+
+static inline
+void outb(unsigned short port, unsigned char val)
+{
+    asm volatile( "outb %0, %1"
+                  : : "a"(val), "Nd"(port) );
+}
+
 uint8_t make_color(enum vga_color fg, enum vga_color bg)
 {
 	return fg | bg << 4;
@@ -73,7 +82,19 @@ void terminal_initialize()
 		}
 	}
 }
+
+void update_cursor(int row, int col)
+ {
+    unsigned short position=(row*80) + col;
  
+    // cursor LOW port to vga INDEX register
+    outb(0x3D4, 0x0F);
+    outb(0x3D5, (unsigned char)(position&0xFF));
+    // cursor HIGH port to vga INDEX register
+    outb(0x3D4, 0x0E);
+    outb(0x3D5, (unsigned char )((position>>8)&0xFF));
+ }
+
 void terminal_setcolor(uint8_t color)
 {
 	terminal_color = color;
@@ -84,10 +105,11 @@ void terminal_putentryat(char c, uint8_t color, size_t x, size_t y)
 	const size_t index = y * VGA_WIDTH + x;
 	terminal_buffer[index] = make_vgaentry(c, color);
 }
- 
+
 void terminal_putchar(char c)
 {
 	terminal_putentryat(c, terminal_color, terminal_column, terminal_row);
+	update_cursor(terminal_row, terminal_column);
 	if ( ++terminal_column == VGA_WIDTH )
 	{
 		terminal_column = 0;
@@ -99,13 +121,6 @@ void terminal_putchar(char c)
 }
 
 static inline
-void outb(unsigned short port, unsigned char val)
-{
-    asm volatile( "outb %0, %1"
-                  : : "a"(val), "Nd"(port) );
-}
-
-static inline
 unsigned char inb(unsigned short port)
 {
     unsigned char ret;
@@ -114,10 +129,21 @@ unsigned char inb(unsigned short port)
     return ret;
 }
 
+static inline
+int irqEnabled()
+{
+    int f;
+    asm volatile ( "pushf\n\t"
+                   "popl %0"
+                   : "=g"(f) );
+    return f & ( 1 << 9 );
+}
+
 void newline()
 {
 	terminal_column = 0;
 	terminal_row++;
+	update_cursor(terminal_row, terminal_column);
 }
 
 void terminal_writestring(const char* data)
@@ -134,34 +160,13 @@ void terminal_writestring(const char* data)
 	}
 }
 
-unsigned char detect_number_harddrive()
-{
-	unsigned char number_harddrive=inb(0x0475);
-	return number_harddrive;
-}
-
-unsigned char detect_display_mode()
-{
-	unsigned char display_mode=inb(0x0449);
-	return display_mode;
-}
-
-void sound_1()
-{
-	outb(0x61,1);
-	outb(0x61,0);
-}
-
 #if defined(__cplusplus)
 extern "C" /* Use C linkage for kernel_main. */
 #endif
 void kernel_main()
 {
 	terminal_initialize();
-	sound_1();
 	terminal_writestring("Hello, kernel World from hometue! :D\n");
-	terminal_writestring("Testing newline()\n");
-	terminal_putchar(detect_number_harddrive());
-	terminal_writestring("\n");
-	terminal_putchar(detect_display_mode());
+	terminal_writestring("Welcome to CookieOS\n");
+	terminal_writestring("Took me forever to finish this, if you can support me by giving me a cookie. :D\n");
 }
