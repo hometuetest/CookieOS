@@ -1,4 +1,4 @@
-Hi. This is my repository for my OS. This shall be an epic place to where adventure leads you...no just joking. Just to explain how to get around.
+Hi. This is my repository for my OS. This shall be an epic place to where adventure leads you...no just joking. Just to explain how to get around. LOL
 
 
 How to get around
